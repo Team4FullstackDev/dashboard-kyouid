@@ -64,7 +64,7 @@ const Health = () => {
 	} else {
 		return (
 			<>
-				<h1>Server Error = {health.message}</h1>
+				<h1 className="text-red-500">Server Error = {health.message}</h1>
 			</>
 		);
 	}
