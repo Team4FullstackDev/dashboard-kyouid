@@ -5,6 +5,7 @@ import CardView from '../components/CardView';
 import growth from '../assets/icons/growth.png';
 import order from '../assets/icons/order.svg';
 import avatar from '../assets/icons/avatar.svg';
+import axios from 'axios';
 
 const Dashboard = () => {
 	return (

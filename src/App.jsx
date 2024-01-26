@@ -8,6 +8,7 @@ import Order from './pages/Order';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import AddProducts from './pages/AddProducts';
+import Health from './pages/health';
 
 const App = () => {
 	return (
@@ -22,6 +23,7 @@ const App = () => {
 					<Route path="/order" element={<Order />} />
 					<Route path="/profile" element={<Profile />} />
 					<Route path="/settings" element={<Settings />} />
+					<Route path="/health" element={<Health />} />
 				</Routes>
 			</RootLayout>
 		</>
