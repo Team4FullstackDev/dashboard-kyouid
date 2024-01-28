@@ -114,8 +114,7 @@ const Sidebar = () => {
 				initial={{ x: isTabletMid ? -250 : 0 }}
 				animate={open ? 'open' : 'closed'}
 				className=" bg-white text-gray shadow-xl z-[999] max-w-[16rem]  w-[16rem] 
-            overflow-hidden md:relative fixed
-         h-screen "
+            overflow-hidden md:relative fixed h-screen "
 			>
 				<div className="flex items-center  font-medium border-b py-3 border-slate-300  mx-3">
 					<img
