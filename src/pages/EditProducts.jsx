@@ -1,9 +1,15 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Box from "../components/Box";
 import axios from "axios";
 
-const AddProducts = () => {
+import { useNavigate, useParams } from "react-router-dom";
+
+const EditProducts = () => {
   const baseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [msg, setMsg] = useState("");
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("");
@@ -14,9 +20,6 @@ const AddProducts = () => {
   const [series, setSeries] = useState("");
   const [character, setCharacter] = useState("");
   const [manufacture, setManufacture] = useState("");
-  const [images, setImages] = useState([]);
-  const [thumbnail, setThumbnail] = useState([]);
-  const thumbnailRef = useRef(null);
 
   const categories = [
     { value: "Nendoroid" },
@@ -31,82 +34,53 @@ const AddProducts = () => {
     { value: "Manga" },
     { value: "" },
   ];
-  // const handleImageChange = (e, index) => {
-  //   const newImages = [...images];
-  //   newImages[index - 1] = e.target.files[0];
-  //   setImages(newImages);
-  // };
 
-  const handleSubmit = async (e) => {
+  const updateProduct = async (e) => {
     e.preventDefault();
-
     try {
-      // Check if at least one image is selected
-      if (images.length === 0) {
-        alert("Please select at least one image");
-        return;
-      }
-
-      const formData = new FormData();
-
-      // Add product information to formData
-      formData.append("title", title);
-      formData.append("description", description);
-      formData.append("status", status);
-      formData.append("price", price);
-      formData.append("stock", stock);
-      formData.append("minimumCredits", minimumCredits);
-      formData.append("category", category);
-      formData.append("character", character);
-      formData.append("series", series);
-      formData.append("manufacture", manufacture);
-
-      // Add thumbnail to formData
-      if (thumbnail) {
-        formData.append("thumbnail", thumbnail);
-      }
-
-      // Add images to formData
-      for (let i = 0; i < images.length; i++) {
-        formData.append("image", images[i]);
-      }
-
-      // Send product information and images in a single request
-      const createProduct = await axios.post(`${baseUrl}/products`, formData);
-
-      console.log("Product created successfully:", createProduct.data);
-      alert("Product and images are successfully uploaded!");
-      resetForm();
+      await axios.patch(`${baseUrl}/products/${id}`, {
+        title,
+        description,
+        status,
+        price,
+        stock,
+        minimumCredits,
+        category,
+        character,
+        series,
+        manufacture,
+      });
+      navigate("/");
+      alert("Product updated successfully");
     } catch (error) {
-      console.error("Error creating product:", error);
+      if (error.response) {
+        setMsg(error.response.data.msg);
+      }
     }
   };
-
-  const resetForm = () => {
-    setTitle("");
-    setDescription("");
-    setStatus("");
-    setPrice("");
-    setStock("");
-    setMinimumCredits("");
-    setCategory("");
-    setCharacter("");
-    setSeries("");
-    setManufacture("");
-    setThumbnail([]);
-    setImages([]);
-    thumbnailRef.current.value = "";
+  const getProductById = async () => {
+    const response = await axios.get(`${baseUrl}/products/${id}`);
+    setCategory(response.data.data.category);
+    setTitle(response.data.data.title);
+    setDescription(response.data.data.description);
+    setStatus(response.data.data.status);
+    setPrice(response.data.data.price);
+    setStock(response.data.data.stock);
+    setMinimumCredits(response.data.data.minimumCredits);
+    setCharacter(response.data.data.character);
+    setSeries(response.data.data.series);
+    setManufacture(response.data.data.manufacture);
   };
+
+  useEffect(() => {
+    getProductById();
+  }, []);
 
   return (
     <>
       <Box>
         <div className="w-full mt-4 px-12">
-          <form
-            onSubmit={handleSubmit}
-            className="mt-12"
-            encType="multipart/form-data"
-          >
+          <form onSubmit={updateProduct} className="mt-12">
             {/* information Product */}
             <div id="information" className=" mb-4">
               <p className="text-3xl font-bold">Informasi Produk</p>
@@ -134,7 +108,7 @@ const AddProducts = () => {
                   Status :
                 </label>
                 <select
-                  name={status}
+                  name=""
                   id=""
                   className="  px-3 py-2 placeholder-gray-400 border rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
                   onChange={(e) => setStatus(e.target.value)}
@@ -168,10 +142,9 @@ const AddProducts = () => {
                   Category :
                 </label>
                 <select
-                  name={category}
+                  name=""
                   id=""
                   className="  px-3 py-2 placeholder-gray-400 border rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
-                  onChange={(e) => setCategory(e.target.value)}
                 >
                   {categories
                     .sort((a, b) => a.value.localeCompare(b.value))
@@ -251,36 +224,35 @@ const AddProducts = () => {
               </div>
               <div className="mb-4">
                 <label
-                  htmlFor="thumbnail"
-                  className="block text-gray-700 font-bold mb-2"
-                >
-                  Thumbnail :
-                </label>
-                <input
-                  ref={thumbnailRef}
-                  type="file"
-                  id="thumbnail"
-                  onChange={(e) =>
-                    setThumbnail(e.target.files && e.target.files[0])
-                  }
-                  className="w-full px-3 py-2 placeholder-gray-400 border rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
-                />
-              </div>
-              <div className="mb-4">
-                <label
                   htmlFor="image"
                   className="block text-gray-700 font-bold mb-2"
                 >
                   Upload Image:
                 </label>
-                <input
-                  className="w-full px-3 py-2 placeholder-gray-400 border rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
-                  type="file"
-                  name="image[]"
-                  id="image"
-                  onChange={(e) => setImages(e.target.files)}
-                  multiple
-                />
+
+                {/* <div className="grid grid-cols-3 gap-4">
+                  <input
+                    type="file"
+                    id="image"
+                    value={character}
+                    onChange={(e) => setCharacter(e.target.value)}
+                    className=" px-3 py-2 placeholder-gray-400 border rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+                  />
+                  <input
+                    type="file"
+                    id="image"
+                    value={character}
+                    onChange={(e) => setCharacter(e.target.value)}
+                    className=" px-3 py-2 placeholder-gray-400 border rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+                  />
+                  <input
+                    type="file"
+                    id="image"
+                    value={character}
+                    onChange={(e) => setCharacter(e.target.value)}
+                    className=" px-3 py-2 placeholder-gray-400 border rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+                  />
+                </div> */}
               </div>
             </div>
             {/* end detail Product */}
@@ -323,7 +295,7 @@ const AddProducts = () => {
 
             <button
               type="submit"
-              className="bg-mod-color-orange-100 py-2 px-4 rounded"
+              className="bg-mod-color-orange-100   font-bold py-2 px-4 rounded"
             >
               Submit
             </button>
@@ -334,4 +306,4 @@ const AddProducts = () => {
   );
 };
 
-export default AddProducts;
+export default EditProducts;

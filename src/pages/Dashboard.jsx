@@ -6,8 +6,22 @@ import growth from '../assets/icons/growth.png';
 import order from '../assets/icons/order.svg';
 import avatar from '../assets/icons/avatar.svg';
 import axios from 'axios';
+import SeacrhBar from '../components/SeacrhBar';
 
 const Dashboard = () => {
+	const [data, setData] = React.useState([]);
+
+	React.useEffect(() => {
+		axios
+			.get('https://dummyjson.com/users')
+			.then((res) => {
+				setData(res.data.users);
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+	}, []);
+
 	return (
 		<>
 			<Box>
@@ -40,6 +54,42 @@ const Dashboard = () => {
 						value="10 k"
 						description="Current Month"
 					/>
+				</div>
+			</Box>
+
+			<Box className="mt-5">
+				<div className="grid grid-cols-12 grid-flow-row content-center">
+					<div className="col-span-8 flex items-center">
+						<Title>Rencent Orders</Title>
+					</div>
+					<div className="col-span-4">
+						<SeacrhBar action="/orders" />
+					</div>
+				</div>
+				<div className="overflow-scroll mt-5 max-h-80 p-1">
+					<table className="table-auto w-full border border-collapse border-slate-100 rounded-t-sm">
+						<thead>
+							<tr className="bg-slate-100 p-5">
+								<th>Costumer Name</th>
+								<th>Products Name</th>
+								<th>Qty</th>
+								<th>Order Date</th>
+								<th>Price</th>
+								<th>Status</th>
+							</tr>
+						</thead>
+						<tbody className="text-center">
+							{data.map((user) => {
+								return (
+									<>
+										<tr key={user.id}>
+											<td className="border">{user.firstName}</td>
+										</tr>
+									</>
+								);
+							})}
+						</tbody>
+					</table>
 				</div>
 			</Box>
 		</>
