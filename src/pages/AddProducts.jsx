@@ -31,56 +31,52 @@ const AddProducts = () => {
     { value: "Manga" },
     { value: "" },
   ];
-  const handleImageChange = (e, index) => {
-    const newImages = [...images];
-    newImages[index - 1] = e.target.files[0];
-    setImages(newImages);
-  };
+  // const handleImageChange = (e, index) => {
+  //   const newImages = [...images];
+  //   newImages[index - 1] = e.target.files[0];
+  //   setImages(newImages);
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const createProduct = await axios.post(`${baseUrl}/products`, {
-        title,
-        description,
-        status,
-        price,
-        stock,
-        minimumCredits,
-        category,
-        character,
-        series,
-        manufacture,
-      });
-      console.log("Product created successfully:", createProduct.data);
+      // Check if at least one image is selected
+      if (images.length === 0) {
+        alert("Please select at least one image");
+        return;
+      }
 
       const formData = new FormData();
+
+      // Add product information to formData
+      formData.append("title", title);
+      formData.append("description", description);
+      formData.append("status", status);
+      formData.append("price", price);
+      formData.append("stock", stock);
+      formData.append("minimumCredits", minimumCredits);
+      formData.append("category", category);
+      formData.append("character", character);
+      formData.append("series", series);
+      formData.append("manufacture", manufacture);
 
       // Add thumbnail to formData
       if (thumbnail) {
         formData.append("thumbnail", thumbnail);
       }
 
-      if (images.length > 0) {
-        // Add images to formData
-        for (let i = 0; i < images.length; i++) {
-          formData.append("image", images[i]);
-        }
-
-        // Add product ID to formData
-        formData.append("productsId", createProduct.data.data.id);
-
-        const uploadResponse = await axios.post(
-          `${baseUrl}/images/products`,
-          formData
-        );
-        console.log("Images uploaded successfully:", uploadResponse.data);
-        alert("Products and images are successfully uploaded!");
-        resetForm();
-      } else {
-        alert("Please select at least one image");
+      // Add images to formData
+      for (let i = 0; i < images.length; i++) {
+        formData.append("image", images[i]);
       }
+
+      // Send product information and images in a single request
+      const createProduct = await axios.post(`${baseUrl}/products`, formData);
+
+      console.log("Product created successfully:", createProduct.data);
+      alert("Product and images are successfully uploaded!");
+      resetForm();
     } catch (error) {
       console.error("Error creating product:", error);
     }
@@ -106,7 +102,11 @@ const AddProducts = () => {
     <>
       <Box>
         <div className="w-full mt-4 px-12">
-          <form onSubmit={handleSubmit} className="mt-12">
+          <form
+            onSubmit={handleSubmit}
+            className="mt-12"
+            encType="multipart/form-data"
+          >
             {/* information Product */}
             <div id="information" className=" mb-4">
               <p className="text-3xl font-bold">Informasi Produk</p>
@@ -273,17 +273,14 @@ const AddProducts = () => {
                 >
                   Upload Image:
                 </label>
-                <div className="grid grid-cols-3 gap-4">
-                  {[1, 2, 3].map((index) => (
-                    <input
-                      key={index}
-                      type="file"
-                      id={`image${index}`}
-                      onChange={(e) => handleImageChange(e, index)}
-                      className="px-3 py-2 placeholder-gray-400 border rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
-                    />
-                  ))}
-                </div>
+                <input
+                  className="w-full px-3 py-2 placeholder-gray-400 border rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+                  type="file"
+                  name="image[]"
+                  id="image"
+                  onChange={(e) => setImages(e.target.files)}
+                  multiple
+                />
               </div>
             </div>
             {/* end detail Product */}

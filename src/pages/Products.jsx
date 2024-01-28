@@ -13,7 +13,7 @@ const Products = () => {
   const fetchProducts = async () => {
     try {
       const response = await axios.get(`${baseUrl}/products`);
-      const sortedProducts = response.data.data.sort((a, b) => {
+      const sortedProducts = response.data.data.products.sort((a, b) => {
         return new Date(b.createdAt) - new Date(a.createdAt);
       });
       setProducts(sortedProducts);
